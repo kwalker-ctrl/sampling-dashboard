@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<!-- saved from url=(0237)file:///Users/keithwalker/Library/Application%20Support/Claude/local-agent-mode-sessions/b500c67b-b817-422e-9c02-bf25481b43fc/7f532988-7677-46e8-b907-43f701bceaef/local_63a259a3-f1bd-4e6c-a040-dc102db626e3/outputs/sampling_dashboard.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACE Beverage — 2026 National Sampling Dashboard</title>
+    <link href="./ACE Beverage — 2026 National Sampling Dashboard_files/css2" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f0f4f8;
+            --card-bg: #ffffff;
+            --header-bg: #0f2447;
+            --text-primary: #1a202c;
+            --text-secondary: #718096;
+            --text-muted: #a0aec0;
+            --border: #e2e8f0;
+            --abg: #2563eb;
+            --abg-light: #eff6ff;
+            --corby: #7c3aed;
+            --corby-light: #f5f3ff;
+            --kdp: #d97706;
+            --kdp-light: #fffbeb;
+            --success: #16a34a;
+            --warning: #ca8a04;
+            --danger: #dc2626;
+            --info: #0284c7;
+            --radius: 12px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; }
+
+        /* ── Header ── */
+        header {
+            background: var(--header-bg);
+            color: white;
+            padding: 0 32px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-left { display: flex; align-items: center; gap: 16px; }
+        .header-logo { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+        .header-logo span { color: #60a5fa; }
+        .header-divider { width: 1px; height: 24px; background: rgba(255,255,255,0.2); }
+        .header-title { font-size: 14px; font-weight: 500; color: rgba(255,255,255,0.8); letter-spacing: 0.3px; }
+        .header-right { display: flex; align-items: center; gap: 12px; }
+        .status-badge { display: flex; align-items: center; gap: 6px; font-size: 12px; color: rgba(255,255,255,0.7); }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; flex-shrink: 0; }
+        .status-dot.loading { background: #fbbf24; animation: pulse 1s infinite; }
+        .status-dot.error { background: #f87171; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spinner { display: inline-block; width: 13px; height: 13px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; }
+
+        .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: all 0.15s; font-family: inherit; }
+        .btn-glass { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); }
+        .btn-glass:hover { background: rgba(255,255,255,0.2); }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-secondary { background: var(--bg); color: var(--text-primary); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: var(--border); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ── Layout ── */
+        main { padding: 24px 32px; max-width: 1700px; margin: 0 auto; }
+
+        /* ── Controls Row ── */
+        .controls-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+        .controls-left { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+        .province-tabs { display: flex; gap: 4px; background: white; padding: 4px; border-radius: 10px; box-shadow: var(--shadow); }
+        .tab-btn { padding: 7px 18px; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; color: var(--text-secondary); background: transparent; font-family: inherit; }
+        .tab-btn:hover { background: var(--bg); color: var(--text-primary); }
+        .tab-btn.active { background: var(--header-bg); color: white; box-shadow: var(--shadow); }
+
+        .date-filter { display: flex; align-items: center; gap: 8px; background: white; border-radius: 10px; padding: 7px 14px; box-shadow: var(--shadow); font-size: 13px; color: var(--text-secondary); }
+        .date-filter select { border: none; font-size: 13px; color: var(--text-primary); font-weight: 600; cursor: pointer; background: transparent; font-family: inherit; outline: none; }
+
+        /* ── KPI Cards ── */
+        .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .kpi-card { background: white; border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow); border-top: 3px solid transparent; }
+        .kpi-card.overall { border-color: #64748b; }
+        .kpi-card.abg     { border-color: var(--abg); }
+        .kpi-card.corby   { border-color: var(--corby); }
+        .kpi-card.kdp     { border-color: var(--kdp); }
+        .kpi-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-secondary); margin-bottom: 8px; }
+        .kpi-value { font-size: 30px; font-weight: 800; color: var(--text-primary); letter-spacing: -1px; line-height: 1; margin-bottom: 4px; }
+        .kpi-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+        .kpi-bar { height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden; }
+        .kpi-bar-fill { height: 100%; border-radius: 3px; transition: width 0.7s ease; }
+        .kpi-pct { font-size: 12px; font-weight: 700; margin-top: 6px; }
+
+        /* ── Brand Grid ── */
+        .brand-grid { display: grid; grid-template-columns: 2fr 1.4fr 1fr; gap: 16px; margin-bottom: 24px; }
+
+        .section-card { background: white; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+        .section-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        .section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; }
+        .section-title.abg   { color: var(--abg); }
+        .section-title.corby { color: var(--corby); }
+        .section-title.kdp   { color: var(--kdp); }
+        .section-title.neutral { color: var(--text-secondary); }
+        .section-total { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+        .section-body { padding: 16px 20px; }
+
+        /* ── SKU Items ── */
+        .sku-group { margin-bottom: 16px; }
+        .sku-group:last-child { margin-bottom: 0; }
+        .sku-group-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px dashed var(--border); }
+        .sku-item { margin-bottom: 10px; }
+        .sku-item:last-child { margin-bottom: 0; }
+        .sku-info { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 4px; gap: 8px; }
+        .sku-name { font-size: 13px; font-weight: 500; color: var(--text-primary); white-space: nowrap; }
+        .sku-numbers { font-size: 12px; color: var(--text-secondary); white-space: nowrap; }
+        .sku-numbers strong { color: var(--text-primary); font-weight: 700; }
+        .progress-bar { height: 8px; background: #f1f5f9; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; border-radius: 4px; transition: width 0.7s ease; }
+        .no-target { font-size: 11px; color: var(--text-muted); font-style: italic; margin-top: 2px; }
+
+        /* ── Bottom Row ── */
+        .bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+        /* ── Leaderboard ── */
+        .lb-table { width: 100%; border-collapse: collapse; }
+        .lb-table th { text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); padding: 0 8px 8px 8px; border-bottom: 1px solid var(--border); }
+        .lb-table td { padding: 9px 8px; border-bottom: 1px solid #f8fafc; font-size: 13px; }
+        .lb-table tr:last-child td { border-bottom: none; }
+        .rank-badge { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; font-size: 11px; font-weight: 700; }
+        .rank-1 { background: #fef9c3; color: #a16207; }
+        .rank-2 { background: #f1f5f9; color: #64748b; }
+        .rank-3 { background: #fef3c7; color: #92400e; }
+        .rank-other { background: transparent; color: var(--text-muted); font-size: 12px; }
+        .rep-bar { height: 4px; background: #f1f5f9; border-radius: 2px; margin-top: 4px; }
+        .rep-bar-fill { height: 100%; border-radius: 2px; background: var(--info); }
+
+        /* ── Activity Feed ── */
+        .activity-item { padding: 10px 0; border-bottom: 1px solid #f8fafc; display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: start; }
+        .activity-item:last-child { border-bottom: none; }
+        .activity-brand { font-size: 13px; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .activity-rep { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+        .activity-location { font-size: 11px; color: var(--text-muted); }
+        .activity-samples { font-size: 14px; font-weight: 800; color: var(--text-primary); text-align: right; }
+        .activity-date { font-size: 11px; color: var(--text-muted); text-align: right; }
+
+        /* ── Province Badges ── */
+        .prov-badge { display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+        .prov-bc { background: #dbeafe; color: #1d4ed8; }
+        .prov-on { background: #f3e8ff; color: #6d28d9; }
+        .prov-ab { background: #fef3c7; color: #92400e; }
+        .prov-sk,.prov-mb,.prov-other { background: #f1f5f9; color: #64748b; }
+
+        /* ── Empty / Error States ── */
+        .empty-state { padding: 40px 20px; text-align: center; color: var(--text-secondary); }
+        .empty-state .icon { font-size: 36px; margin-bottom: 10px; }
+        .empty-state h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+        .empty-state p { font-size: 13px; line-height: 1.6; }
+        .empty-state a { color: var(--abg); }
+        .error-box { background: #fef2f2; border: 1px solid #fecaca; border-radius: 10px; padding: 20px 24px; color: #991b1b; font-size: 13px; line-height: 1.7; }
+        .error-box strong { display: block; font-size: 15px; margin-bottom: 6px; }
+        .info-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 16px; font-size: 12px; color: #1d4ed8; line-height: 1.6; margin-bottom: 20px; }
+
+        /* ── Settings Modal ── */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-overlay.open { display: flex; }
+        .modal { background: white; border-radius: 16px; padding: 32px; width: 580px; max-width: 92vw; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.25); }
+        .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+        .modal-subtitle { font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.6; }
+        .form-group { margin-bottom: 14px; }
+        .form-label { font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; display: block; }
+        .form-select { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; color: var(--text-primary); background: white; cursor: pointer; font-family: inherit; }
+        .form-select:focus { outline: none; border-color: var(--abg); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+        .form-input { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; color: var(--text-primary); font-family: inherit; }
+        .form-input:focus { outline: none; border-color: var(--abg); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+        .modal-actions { display: flex; gap: 10px; margin-top: 24px; justify-content: flex-end; }
+        .detected-cols { background: #f8fafc; border-radius: 8px; padding: 12px 16px; margin-bottom: 18px; font-size: 12px; }
+        .detected-cols-title { font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; font-size: 10px; }
+        .detected-col-row { display: flex; justify-content: space-between; padding: 3px 0; color: var(--text-secondary); border-bottom: 1px solid var(--border); }
+        .detected-col-row:last-child { border-bottom: none; }
+        .detected-col-row strong { color: var(--text-primary); }
+
+        /* ── Unmatched Warning Banner ── */
+        .unmatched-banner { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 10px 16px; font-size: 12px; color: #92400e; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+
+        /* ── Apps Script Setup Modal ── */
+        .setup-step { display: flex; gap: 14px; margin-bottom: 18px; align-items: flex-start; }
+        .step-num { width: 26px; height: 26px; border-radius: 50%; background: var(--header-bg); color: white; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+        .step-body { flex: 1; }
+        .step-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+        .step-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+        .step-desc a { color: var(--abg); }
+        .code-block { background: #1e293b; color: #e2e8f0; border-radius: 8px; padding: 14px 16px; font-family: 'Courier New', monospace; font-size: 11px; line-height: 1.7; margin: 10px 0; position: relative; white-space: pre; overflow-x: auto; }
+        .copy-btn { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.1); color: #94a3b8; border: 1px solid rgba(255,255,255,0.15); border-radius: 5px; padding: 4px 10px; font-size: 11px; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+        .copy-btn:hover { background: rgba(255,255,255,0.2); color: white; }
+        .url-input-row { display: flex; gap: 8px; margin-top: 8px; }
+        .url-input-row input { flex: 1; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-family: inherit; }
+        .url-input-row input:focus { outline: none; border-color: var(--abg); }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-left">
+        <div class="header-logo">ACE <span>Beverage</span></div>
+        <div class="header-divider"></div>
+        <div class="header-title">2026 National Sampling Dashboard</div>
+    </div>
+    <div class="header-right">
+        <div class="status-badge">
+            <div class="status-dot" id="status-dot"></div>
+            <span id="status-text">Updated 01:53 p.m.</span>
+        </div>
+        <button class="btn btn-glass" id="refresh-btn" onclick="refreshData()"><svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Refresh</button>
+        <button class="btn btn-glass" onclick="openSetupModal()" style="background: rgba(250, 204, 21, 0.15); border-color: rgba(250, 204, 21, 0.4); display: none;" id="connect-btn">
+            🔌 Connect Data
+        </button>
+        <button class="btn btn-glass" onclick="openSettings()">
+            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            Column Setup
+        </button>
+    </div>
+</header>
+
+<main>
+    <!-- Controls -->
+    <div class="controls-row">
+        <div class="controls-left">
+            <div class="province-tabs">
+                <button class="tab-btn active" data-province="ALL" onclick="setProvince(&#39;ALL&#39;)">All Provinces</button>
+                <button class="tab-btn" data-province="BC" onclick="setProvince(&#39;BC&#39;)">BC</button>
+                <button class="tab-btn" data-province="ON" onclick="setProvince(&#39;ON&#39;)">Ontario</button>
+            </div>
+            <div class="date-filter">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"></rect><line x1="16" y1="2" x2="16" y2="6" stroke-width="2" stroke-linecap="round"></line><line x1="8" y1="2" x2="8" y2="6" stroke-width="2" stroke-linecap="round"></line><line x1="3" y1="10" x2="21" y2="10" stroke-width="2"></line></svg>
+                <select id="date-filter" onchange="applyFilters()">
+                    <option value="all">All Time</option>
+                    <option value="ytd">Year to Date</option>
+                    <option value="month">This Month</option>
+                    <option value="week">This Week</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPI Row -->
+    <div class="kpi-row" id="kpi-row"><div class="kpi-card overall">
+            <div class="kpi-label">Total Program</div>
+            <div class="kpi-value">1,000</div>
+            <div class="kpi-sub">of 340,000 target</div>
+            <div class="kpi-bar"><div class="kpi-bar-fill" style="width:0.3%;background:#dc2626"></div></div>
+            <div class="kpi-pct" style="color:#dc2626">0.3% complete</div>
+        </div><div class="kpi-card abg">
+            <div class="kpi-label">ABG Brands</div>
+            <div class="kpi-value">1,000</div>
+            <div class="kpi-sub">of 162,500 target</div>
+            <div class="kpi-bar"><div class="kpi-bar-fill" style="width:0.6%;background:#dc2626"></div></div>
+            <div class="kpi-pct" style="color:#dc2626">0.6% complete</div>
+        </div><div class="kpi-card corby">
+            <div class="kpi-label">Corby</div>
+            <div class="kpi-value">0</div>
+            <div class="kpi-sub">of 90,000 target</div>
+            <div class="kpi-bar"><div class="kpi-bar-fill" style="width:0.0%;background:#dc2626"></div></div>
+            <div class="kpi-pct" style="color:#dc2626">0.0% complete</div>
+        </div><div class="kpi-card kdp">
+            <div class="kpi-label">KDP</div>
+            <div class="kpi-value">0</div>
+            <div class="kpi-sub">of 87,500 target</div>
+            <div class="kpi-bar"><div class="kpi-bar-fill" style="width:0.0%;background:#dc2626"></div></div>
+            <div class="kpi-pct" style="color:#dc2626">0.0% complete</div>
+        </div></div>
+
+    <!-- Brand Progress -->
+    <div class="brand-grid" id="brand-grid">
+    <div class="section-card">
+        <div class="section-header">
+            <div class="section-title abg">ACE Beverage Group (ABG)</div>
+            <div class="section-total">1,000 / 162,500 — 0.6%</div>
+        </div>
+        <div class="section-body"><div class="sku-group"><div class="sku-group-label">Cottage Springs</div><div class="sku-item">
+        <div class="sku-info">
+            <span class="sku-name">CS Freezie</span>
+            <span class="sku-numbers"><strong>1,000</strong> / 80,000&nbsp;<span style="color:#dc2626;font-weight:700">1.3%</span></span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:1.3%;background:#dc2626"></div></div>
+    </div><div class="sku-item">
+        <div class="sku-info">
+            <span class="sku-name">CS Other</span>
+            <span class="sku-numbers"><strong>0</strong> / 10,000&nbsp;<span style="color:#dc2626;font-weight:700">0.0%</span></span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:0.0%;background:#dc2626"></div></div>
+    </div></div><div class="sku-group"><div class="sku-group-label">Nude</div><div class="sku-item">
+        <div class="sku-info">
+            <span class="sku-name">Nude</span>
+            <span class="sku-numbers"><strong>0</strong> / 40,000&nbsp;<span style="color:#dc2626;font-weight:700">0.0%</span></span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:0.0%;background:#dc2626"></div></div>
+    </div></div><div class="sku-group"><div class="sku-group-label">Dock Day</div><div class="sku-item">
+        <div class="sku-info">
+            <span class="sku-name">Dock Day</span>
+            <span class="sku-numbers"><strong>0</strong> / 5,000&nbsp;<span style="color:#dc2626;font-weight:700">0.0%</span></span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:0.0%;background:#dc2626"></div></div>
+    </div></div><div class="sku-group"><div class="sku-group-label">Shore Shakers</div><div class="sku-item">
+        <div class="sku-info">
+            <span class="sku-name">Tropical Citrus</span>
+            <span class="sku-numbers"><strong>0</strong> / 20,000&nbsp;<span style="color:#dc2626;font-weight:700">0.0%</span></span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:0.0%;background:#dc2626"></div></div>
+    </div><div class="sku-item">
+        <div class="sku-info">
+            <span class="sku-name">Blood Orange</span>
+            <span class="sku-numbers"><strong>0</strong> / 7,500&nbsp;<span style="color:#dc2626;font-weight:700">0.0%</span></span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:0.0%;background:#dc2626"></div></div>
+    </div></div></div>
+    </div>
+    <div class="section-card">
+        <div class="section-header">
+            <div class="section-title corby">Corby</div>
+            <div class="section-total">0 / 90,000 — 0.0%</div>
+        </div>
+        <div class="section-body"><div class="sku-item">
+        <div class="sku-info">
+            <span class="sku-name">Malibu</span>
+            <span class="sku-numbers"><strong>0</strong> / 20,000&nbsp;<span style="color:#dc2626;font-weight:700">0.0%</span></span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:0.0%;background:#dc2626"></div></div>
+    </div><div class="sku-item">
+        <div class="sku-info">
+            <span class="sku-name">JP Wiser</span>
+            <span class="sku-numbers"><strong>0</strong> / 20,000&nbsp;<span style="color:#dc2626;font-weight:700">0.0%</span></span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:0.0%;background:#dc2626"></div></div>
+    </div><div class="sku-item">
+        <div class="sku-info">
+            <span class="sku-name">Jameson</span>
+            <span class="sku-numbers"><strong>0</strong> / 20,000&nbsp;<span style="color:#dc2626;font-weight:700">0.0%</span></span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:0.0%;background:#dc2626"></div></div>
+    </div><div class="sku-item">
+        <div class="sku-info">
+            <span class="sku-name">Polar Ice</span>
+            <span class="sku-numbers"><strong>0</strong> / 10,000&nbsp;<span style="color:#dc2626;font-weight:700">0.0%</span></span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:0.0%;background:#dc2626"></div></div>
+    </div><div class="sku-item">
+        <div class="sku-info">
+            <span class="sku-name">Absolut</span>
+            <span class="sku-numbers"><strong>0</strong> / 20,000&nbsp;<span style="color:#dc2626;font-weight:700">0.0%</span></span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:0.0%;background:#dc2626"></div></div>
+    </div></div>
+    </div>
+    <div class="section-card">
+        <div class="section-header">
+            <div class="section-title kdp">KDP</div>
+            <div class="section-total">0 / 87,500 — 0.0%</div>
+        </div>
+        <div class="section-body"><div class="sku-item">
+        <div class="sku-info">
+            <span class="sku-name">Snapple</span>
+            <span class="sku-numbers"><strong>0</strong> / 55,000&nbsp;<span style="color:#dc2626;font-weight:700">0.0%</span></span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:0.0%;background:#dc2626"></div></div>
+    </div><div class="sku-item">
+        <div class="sku-info">
+            <span class="sku-name">Clamato</span>
+            <span class="sku-numbers"><strong>0</strong> / 32,500&nbsp;<span style="color:#dc2626;font-weight:700">0.0%</span></span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:0.0%;background:#dc2626"></div></div>
+    </div></div>
+    </div></div>
+
+    <!-- Bottom Row -->
+    <div class="bottom-grid">
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-title neutral">Rep Leaderboard</div>
+                <div class="section-total" id="lb-count">1 rep</div>
+            </div>
+            <div class="section-body" id="lb-body">
+    <table class="lb-table">
+        <thead><tr><th>#</th><th>Rep</th><th style="text-align:right">Samples</th></tr></thead>
+        <tbody><tr>
+            <td><span class="rank-badge rank-1">1</span></td>
+            <td>
+                <div style="font-weight:600">Test</div>
+                <div style="margin-top:3px"><span class="prov-badge prov-other">Unknown</span></div>
+                <div class="rep-bar"><div class="rep-bar-fill" style="width:100%"></div></div>
+            </td>
+            <td style="text-align:right;font-weight:800;font-size:14px">1,000</td>
+        </tr></tbody>
+    </table></div>
+        </div>
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-title neutral">Recent Submissions</div>
+                <div class="section-total" id="activity-count">2 total</div>
+            </div>
+            <div class="section-body" id="activity-body">
+    <div class="activity-item">
+        <div>
+            <div class="activity-brand">CS Freezie <span class="prov-badge prov-other">Unknown</span></div>
+            <div class="activity-rep">Test</div>
+            <div class="activity-location">Test</div>
+        </div>
+        <div>
+            <div class="activity-samples">1,000</div>
+            <div class="activity-date">Mar 17</div>
+        </div>
+    </div></div>
+        </div>
+    </div>
+</main>
+
+<!-- Apps Script Setup Modal -->
+<div class="modal-overlay" id="setup-modal">
+    <div class="modal">
+        <div class="modal-title">🔌 Connect Your Google Sheet</div>
+        <div class="modal-subtitle">A one-time 3-minute setup that permanently fixes the connection. This works by adding a small script to your Google Sheet that serves the data directly to this dashboard.</div>
+
+        <div class="setup-step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+                <div class="step-title">Open your Google Sheet's Script Editor</div>
+                <div class="step-desc">
+                    Go to your <a href="https://docs.google.com/spreadsheets/d/1Yz8_N4-fwtn-V5xI2q5upKXUKGUzKSMkRvOCAtKqOuU" target="_blank">Google Sheet</a> → click <strong>Extensions</strong> in the top menu → click <strong>Apps Script</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="setup-step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+                <div class="step-title">Replace ALL existing code with this script</div>
+                <div class="step-desc">Delete everything in the editor, then paste this:</div>
+                <div class="code-block" id="apps-script-code">function doGet(e) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheets()[0];
+  var sheets = ss.getSheets();
+  for (var i = 0; i &lt; sheets.length; i++) {
+    var n = sheets[i].getName().toLowerCase();
+    if (n.includes('form') || n.includes('response')) {
+      sheet = sheets[i]; break;
+    }
+  }
+  var data = sheet.getDataRange().getValues();
+  var headers = data[0].map(String);
+  var rows = [];
+  for (var r = 1; r &lt; data.length; r++) {
+    var row = {};
+    for (var c = 0; c &lt; headers.length; c++) {
+      var v = data[r][c];
+      if (v instanceof Date) v = v.toISOString();
+      row[headers[c]] = (v === undefined || v === null) ? '' : v;
+    }
+    rows.push(row);
+  }
+  var json = JSON.stringify({headers: headers, rows: rows});
+  var cb = e &amp;&amp; e.parameter &amp;&amp; e.parameter.callback;
+  if (cb) {
+    return ContentService
+      .createTextOutput(cb + '(' + json + ')')
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
+  return ContentService
+    .createTextOutput(json)
+    .setMimeType(ContentService.MimeType.JSON);
+}</div>
+                <button class="copy-btn" onclick="copyScript()">Copy</button>
+            </div>
+        </div>
+
+        <div class="setup-step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+                <div class="step-title">Deploy as a Web App</div>
+                <div class="step-desc">
+                    Click <strong>Deploy → New deployment</strong> → click the gear icon ⚙️ next to "Type" → select <strong>Web app</strong><br><br>
+                    Set <strong>Execute as: Me</strong><br>
+                    Set <strong>Who has access: Anyone</strong><br><br>
+                    Click <strong>Deploy</strong> → authorize when prompted → copy the <strong>Web app URL</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="setup-step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+                <div class="step-title">Paste your Web App URL below</div>
+                <div class="url-input-row">
+                    <input type="text" id="apps-script-url-input" placeholder="https://script.google.com/macros/s/.../exec">
+                    <button class="btn btn-primary" onclick="saveScriptUrl()">Connect</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="closeSetupModal()">Skip for now</button>
+        </div>
+    </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal-overlay" id="settings-modal">
+    <div class="modal">
+        <div class="modal-title">Column Setup</div>
+        <div class="modal-subtitle">Map your Google Form columns to the dashboard fields. The dashboard auto-detects column names on first load — adjust here if anything is mismatched.</div>
+        <div class="info-box">
+            ⚠️ Your Google Sheet must be set to <strong>"Anyone with the link can view"</strong>.<br>
+            In Google Sheets: <strong>Share → Change to anyone with the link → Viewer → Done</strong>
+        </div>
+        <div class="detected-cols" id="detected-cols" style="display:none">
+            <div class="detected-cols-title">Sheet columns detected</div>
+            <div id="detected-cols-list"></div>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Sampling Date column</label>
+            <select class="form-select" id="col-date"></select>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Rep Name column</label>
+            <select class="form-select" id="col-rep"></select>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Sampling Location column</label>
+            <select class="form-select" id="col-location"></select>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Brand / SKU column</label>
+            <select class="form-select" id="col-brand"></select>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Number of Samples Distributed column</label>
+            <select class="form-select" id="col-samples"></select>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="closeSettings()">Cancel</button>
+            <button class="btn btn-primary" onclick="saveSettings()">Save &amp; Apply</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ================================================================
+//  CONFIGURATION — edit these if your sheet changes
+// ================================================================
+const SHEET_ID = '1Yz8_N4-fwtn-V5xI2q5upKXUKGUzKSMkRvOCAtKqOuU';
+const GID      = '1531543496';
+
+// ================================================================
+//  TARGETS  (source: 2026_Sampling_Tracker_All_Provinces.xlsx)
+// ================================================================
+const SKUS = {
+    'CS Freezie':      { brand:'Cottage Springs', group:'ABG',   targets:{BC:15000, ON:65000} },
+    'CS Other':        { brand:'Cottage Springs', group:'ABG',   targets:{BC:0,     ON:10000} },
+    "Slappy's":        { brand:"Slappy's",         group:'ABG',   targets:{BC:0,     ON:0    } },
+    'Nude':            { brand:'Nude',             group:'ABG',   targets:{BC:40000, ON:0    } },
+    'Dock Day':        { brand:'Dock Day',         group:'ABG',   targets:{BC:5000,  ON:0    } },
+    'Mix Pack':        { brand:'Casa Del Rey',     group:'ABG',   targets:{BC:0,     ON:0    } },
+    'Tropical Citrus': { brand:'Shore Shakers',    group:'ABG',   targets:{BC:0,     ON:20000} },
+    'Blood Orange':    { brand:'Shore Shakers',    group:'ABG',   targets:{BC:0,     ON:7500 } },
+    'Malibu':          { brand:'Corby',            group:'CORBY', targets:{BC:10000, ON:10000} },
+    'JP Wiser':        { brand:'Corby',            group:'CORBY', targets:{BC:10000, ON:10000} },
+    'Jameson':         { brand:'Corby',            group:'CORBY', targets:{BC:10000, ON:10000} },
+    'Polar Ice':       { brand:'Corby',            group:'CORBY', targets:{BC:10000, ON:0    } },
+    'Absolut':         { brand:'Corby',            group:'CORBY', targets:{BC:10000, ON:10000} },
+    'Snapple':         { brand:'KDP',              group:'KDP',   targets:{BC:20000, ON:35000} },
+    'Clamato':         { brand:'KDP',              group:'KDP',   targets:{BC:15000, ON:17500} },
+};
+
+const GROUP_TARGETS = {
+    OVERALL: { BC:145000, ON:195000, AB:0, TOTAL:340000 },
+    ABG:     { BC:60000,  ON:102500, AB:0, TOTAL:162500 },
+    CORBY:   { BC:50000,  ON:40000,  AB:0, TOTAL:90000  },
+    KDP:     { BC:35000,  ON:52500,  AB:0, TOTAL:87500  },
+};
+
+const ABG_BRAND_ORDER = [
+    { brandName:'Cottage Springs', skus:['CS Freezie','CS Other'] },
+    { brandName:"Slappy's",        skus:["Slappy's"]              },
+    { brandName:'Nude',            skus:['Nude']                  },
+    { brandName:'Dock Day',        skus:['Dock Day']              },
+    { brandName:'Casa Del Rey',    skus:['Mix Pack']              },
+    { brandName:'Shore Shakers',   skus:['Tropical Citrus','Blood Orange'] },
+];
+
+// ================================================================
+//  BRAND ALIASES  — flexible matching for form entries
+// ================================================================
+const BRAND_ALIASES = {
+    'CS Freezie':      ['cs freezie','cottage springs freezie','cottage springs - cs freezie','csf','freezie','cs - freezie','cottage springs - freezie'],
+    'CS Other':        ['cs other','cottage springs other','cottage springs - other','cs - other'],
+    "Slappy's":        ["slappy's",'slappys','slappy'],
+    'Nude':            ['nude','nude vodka soda','nude booze free','nude hard seltzer','nude soda'],
+    'Dock Day':        ['dock day'],
+    'Mix Pack':        ['mix pack','casa del rey','casa del rey mix pack','casa del rey - mix pack','cdm','casa'],
+    'Tropical Citrus': ['tropical citrus','shore shakers tropical citrus','shore shakers - tropical citrus','ss tropical','tropical'],
+    'Blood Orange':    ['blood orange','shore shakers blood orange','shore shakers - blood orange','ss blood orange'],
+    'Malibu':          ['malibu','malibu rum','malibu coconut rum'],
+    'JP Wiser':        ["jp wiser","j.p. wiser's","j.p. wisers","wisers","wiser's","jp wiser's","wiser"],
+    'Jameson':         ['jameson','jameson whiskey','jameson irish whiskey'],
+    'Polar Ice':       ['polar ice','polar ice vodka'],
+    'Absolut':         ['absolut','absolute','absolut vodka'],
+    'Snapple':         ['snapple','snapple iced tea'],
+    'Clamato':         ['clamato',"mott's clamato",'motts clamato',"mott's"],
+};
+
+// ================================================================
+//  STATE
+// ================================================================
+let allRows = [], allCols = [];
+let colMap  = { date:null, rep:null, location:null, brand:null, samples:null };
+let activeProvince  = 'ALL';
+let activeDateFilter = 'all';
+let isLoading = false;
+let appsScriptUrl = localStorage.getItem('aceSamplingScriptUrl') || null;
+
+// ================================================================
+//  UTILITIES
+// ================================================================
+function fmt(n) { return Math.round(n).toLocaleString('en-CA'); }
+
+function pct(actual, target) {
+    if (!target || target === 0) return null;
+    return (actual / target) * 100;
+}
+
+function pctColor(p) {
+    if (p === null) return '#cbd5e1';
+    if (p >= 100)  return '#16a34a';
+    if (p >= 75)   return '#2563eb';
+    if (p >= 50)   return '#0284c7';
+    if (p >= 25)   return '#ca8a04';
+    return '#dc2626';
+}
+
+function fmtPct(p) {
+    if (p === null) return '—';
+    return Math.min(p, 999).toFixed(1) + '%';
+}
+
+function parseDate(v) {
+    if (!v) return null;
+    if (v instanceof Date) return isNaN(v) ? null : v;
+    if (typeof v === 'string') {
+        const m = v.match(/^Date\((\d+),(\d+),(\d+)\)/);
+        if (m) return new Date(+m[1], +m[2], +m[3]);
+        const d = new Date(v);
+        return isNaN(d) ? null : d;
+    }
+    if (typeof v === 'number') {
+        // Excel serial
+        const d = new Date((v - 25569) * 86400000);
+        return isNaN(d) ? null : d;
+    }
+    return null;
+}
+
+function fmtDate(d) {
+    if (!d) return '—';
+    return d.toLocaleDateString('en-CA', { month:'short', day:'numeric' });
+}
+
+function extractProvince(loc) {
+    if (!loc) return 'Unknown';
+    const s = String(loc).toUpperCase().trim();
+    const codes = ['BC','ON','AB','SK','MB','QC','NB','NS','NL','PE','YT','NT','NU'];
+    for (const code of codes) {
+        if (s === code || s.endsWith(', '+code) || s.endsWith(' '+code) ||
+            new RegExp('\\b'+code+'\\b').test(s)) return code;
+    }
+    const full = {'BRITISH COLUMBIA':'BC','ONTARIO':'ON','ALBERTA':'AB',
+        'SASKATCHEWAN':'SK','MANITOBA':'MB','QUEBEC':'QC','QUÉBEC':'QC',
+        'NEW BRUNSWICK':'NB','NOVA SCOTIA':'NS','NEWFOUNDLAND':'NL',
+        'PRINCE EDWARD ISLAND':'PE'};
+    for (const [k,v] of Object.entries(full)) { if (s.includes(k)) return v; }
+    return 'Unknown';
+}
+
+function matchBrand(raw) {
+    if (!raw) return null;
+    const n = String(raw).toLowerCase().trim();
+    for (const [sku, aliases] of Object.entries(BRAND_ALIASES)) {
+        if (n === sku.toLowerCase()) return sku;
+        for (const a of aliases) { if (n === a || n.includes(a)) return sku; }
+    }
+    for (const sku of Object.keys(SKUS)) {
+        if (n.includes(sku.toLowerCase())) return sku;
+    }
+    return null;
+}
+
+function provBadge(p) {
+    const cls = ['BC','ON','AB','SK','MB'].includes(p) ? 'prov-'+p.toLowerCase() : 'prov-other';
+    return `<span class="prov-badge ${cls}">${p}</span>`;
+}
+
+// ================================================================
+//  COLUMN AUTO-DETECTION
+// ================================================================
+function detectColumns(cols) {
+    const patterns = {
+        date:     ['sampling date','date','event date','shift date','timestamp'],
+        rep:      ['rep name','rep','your name','name','employee','agent','staff'],
+        location: ['sampling location','location','city','province','where','market'],
+        brand:    ['brand','sku','product','brand sampled','product sampled','item'],
+        samples:  ['samples distributed','number of samples','# of samples','samples','units','qty','quantity','distributed'],
+    };
+    const map = {};
+    for (const [field, keywords] of Object.entries(patterns)) {
+        for (const col of cols) {
+            const cl = col.toLowerCase();
+            for (const kw of keywords) {
+                if (cl.includes(kw)) { if (!map[field]) map[field] = col; break; }
+            }
+            if (map[field]) break;
+        }
+    }
+    return map;
+}
+
+// ================================================================
+//  FETCH — JSONP helper (works from file:// via script injection)
+// ================================================================
+function jsonpFetch(url) {
+    return new Promise((resolve, reject) => {
+        const cb = '_gsCb_' + Date.now();
+        let el = null;
+        const timer = setTimeout(() => {
+            cleanup();
+            reject(new Error('TIMEOUT'));
+        }, 15000);
+        function cleanup() {
+            clearTimeout(timer);
+            if (el && el.parentNode) el.parentNode.removeChild(el);
+            delete window[cb];
+        }
+        window[cb] = function(resp) { cleanup(); resolve(resp); };
+        el = document.createElement('script');
+        el.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + cb;
+        el.onerror = () => { cleanup(); reject(new Error('SCRIPT_ERROR')); };
+        document.head.appendChild(el);
+    });
+}
+
+// ================================================================
+//  FETCH — Primary: Apps Script; Fallback: gviz
+// ================================================================
+async function fetchSheetData() {
+    // ── Option 1: Apps Script web app (most reliable) ──
+    if (appsScriptUrl) {
+        try {
+            const resp = await jsonpFetch(appsScriptUrl);
+            if (!resp || !resp.headers || !resp.rows) throw new Error('Bad response from Apps Script');
+            const cols = resp.headers;
+            const rows = resp.rows;
+            return { cols, rows };
+        } catch (err) {
+            if (err.message !== 'TIMEOUT' && err.message !== 'SCRIPT_ERROR') throw err;
+            // Fall through to gviz
+        }
+    }
+
+    // ── Option 2: Google Visualization API (JSONP) ──
+    try {
+        const gvizUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
+        const resp = await jsonpFetch(gvizUrl);
+        if (!resp || !resp.table) throw new Error('EMPTY');
+        const cols = resp.table.cols.map(c => c.label || c.id || '');
+        const rows = (resp.table.rows || []).map(r => {
+            const row = {};
+            (r.c || []).forEach((cell, i) => { row[cols[i]] = (cell && cell.v !== undefined) ? cell.v : null; });
+            return row;
+        });
+        return { cols, rows };
+    } catch (err) {
+        // Both failed — throw a structured error
+        const e = new Error('CONNECTION_FAILED');
+        e.needsSetup = true;
+        throw e;
+    }
+}
+
+// ================================================================
+//  DATA PROCESSING
+// ================================================================
+function getFilteredRows() {
+    const now   = new Date();
+    const sow   = new Date(now); sow.setDate(now.getDate() - now.getDay()); sow.setHours(0,0,0,0);
+    const som   = new Date(now.getFullYear(), now.getMonth(), 1);
+    const soy   = new Date(now.getFullYear(), 0, 1);
+
+    return allRows.filter(row => {
+        if (activeProvince !== 'ALL') {
+            if (extractProvince(colMap.location ? row[colMap.location] : null) !== activeProvince) return false;
+        }
+        if (activeDateFilter !== 'all' && colMap.date) {
+            const d = parseDate(row[colMap.date]);
+            if (d) {
+                if (activeDateFilter === 'week'  && d < sow) return false;
+                if (activeDateFilter === 'month' && d < som) return false;
+                if (activeDateFilter === 'ytd'   && d < soy) return false;
+            }
+        }
+        return true;
+    });
+}
+
+function computeActuals(rows) {
+    const bySku = {};
+    const byRep = {};
+    const unmatchedBrands = new Set();
+    const validRows = [];
+
+    for (const sku of Object.keys(SKUS)) bySku[sku] = {BC:0,ON:0,AB:0,total:0};
+
+    for (const row of rows) {
+        const rawSamples  = colMap.samples  ? row[colMap.samples]  : null;
+        const rawBrand    = colMap.brand    ? row[colMap.brand]    : null;
+        const rawLoc      = colMap.location ? row[colMap.location] : null;
+        const rawRep      = colMap.rep      ? row[colMap.rep]      : null;
+        const rawDate     = colMap.date     ? row[colMap.date]     : null;
+
+        const samples = parseFloat(rawSamples) || 0;
+        if (samples <= 0) continue;
+
+        const sku  = matchBrand(rawBrand);
+        const prov = extractProvince(rawLoc);
+        const rep  = rawRep ? String(rawRep).trim() : 'Unknown';
+        const date = parseDate(rawDate);
+
+        if (sku) {
+            bySku[sku].total += samples;
+            if (bySku[sku][prov] !== undefined) bySku[sku][prov] += samples;
+        } else if (rawBrand) {
+            unmatchedBrands.add(String(rawBrand).trim());
+        }
+
+        if (!byRep[rep]) byRep[rep] = {total:0, byProv:{}};
+        byRep[rep].total += samples;
+        byRep[rep].byProv[prov] = (byRep[rep].byProv[prov] || 0) + samples;
+
+        validRows.push({ sku: sku || String(rawBrand||'—'), samples, prov, rep, date, loc: String(rawLoc||'—') });
+    }
+
+    validRows.sort((a,b) => {
+        if (!a.date && !b.date) return 0;
+        if (!a.date) return 1;
+        if (!b.date) return -1;
+        return b.date - a.date;
+    });
+
+    return { bySku, byRep, validRows, unmatchedBrands };
+}
+
+function skuActual(sku, prov, bySku) {
+    if (!bySku[sku]) return 0;
+    return prov === 'ALL' ? bySku[sku].total : (bySku[sku][prov] || 0);
+}
+
+function skuTarget(sku, prov) {
+    const t = SKUS[sku]?.targets || {};
+    return prov === 'ALL' ? (t.BC||0)+(t.ON||0) : (t[prov]||0);
+}
+
+function groupActual(group, prov, bySku) {
+    let sum = 0;
+    for (const [sku, info] of Object.entries(SKUS)) {
+        if (info.group === group) sum += skuActual(sku, prov, bySku);
+    }
+    return sum;
+}
+
+function groupTarget(group, prov) {
+    const g = GROUP_TARGETS[group];
+    return prov === 'ALL' ? g.TOTAL : (g[prov] || 0);
+}
+
+// ================================================================
+//  RENDER — KPI cards
+// ================================================================
+function renderKPIs(bySku) {
+    const groups = [
+        {id:'OVERALL', label:'Total Program', cls:'overall'},
+        {id:'ABG',     label:'ABG Brands',    cls:'abg'},
+        {id:'CORBY',   label:'Corby',         cls:'corby'},
+        {id:'KDP',     label:'KDP',           cls:'kdp'},
+    ];
+    document.getElementById('kpi-row').innerHTML = groups.map(g => {
+        const actual = g.id === 'OVERALL'
+            ? Object.values(bySku).reduce((s,v) => s + (activeProvince==='ALL' ? v.total : (v[activeProvince]||0)), 0)
+            : groupActual(g.id, activeProvince, bySku);
+        const target = groupTarget(g.id, activeProvince);
+        const p = pct(actual, target);
+        const color = pctColor(p);
+        const w = p !== null ? Math.min(p, 100).toFixed(1) : 0;
+        return `<div class="kpi-card ${g.cls}">
+            <div class="kpi-label">${g.label}</div>
+            <div class="kpi-value">${fmt(actual)}</div>
+            <div class="kpi-sub">of ${fmt(target)} target</div>
+            <div class="kpi-bar"><div class="kpi-bar-fill" style="width:${w}%;background:${color}"></div></div>
+            <div class="kpi-pct" style="color:${color}">${fmtPct(p)} complete</div>
+        </div>`;
+    }).join('');
+}
+
+// ================================================================
+//  RENDER — Brand progress bars
+// ================================================================
+function skuRow(sku, prov, bySku) {
+    const actual = skuActual(sku, prov, bySku);
+    const target = skuTarget(sku, prov);
+    if (target === 0 && actual === 0) return '';
+    const p = pct(actual, target);
+    const color = pctColor(p);
+    const w = p !== null ? Math.min(p, 100).toFixed(1) : 0;
+    const pctStr = p !== null ? fmtPct(p) : 'No target';
+    return `<div class="sku-item">
+        <div class="sku-info">
+            <span class="sku-name">${sku}</span>
+            <span class="sku-numbers"><strong>${fmt(actual)}</strong> / ${target > 0 ? fmt(target) : '—'}&nbsp;<span style="color:${color};font-weight:700">${pctStr}</span></span>
+        </div>
+        ${target > 0
+            ? `<div class="progress-bar"><div class="progress-fill" style="width:${w}%;background:${color}"></div></div>`
+            : `<div class="no-target">No target set for this province</div>`}
+    </div>`;
+}
+
+function renderBrandProgress(bySku) {
+    const prov = activeProvince;
+
+    // ABG
+    const abgActual = groupActual('ABG', prov, bySku);
+    const abgTarget = groupTarget('ABG', prov);
+    const abgP = pct(abgActual, abgTarget);
+    let abgHtml = ABG_BRAND_ORDER.map(({brandName, skus}) => {
+        const rows = skus.map(s => skuRow(s, prov, bySku)).join('');
+        return rows ? `<div class="sku-group"><div class="sku-group-label">${brandName}</div>${rows}</div>` : '';
+    }).join('');
+    if (!abgHtml) abgHtml = '<div class="no-target" style="text-align:center;padding:12px">No data for this selection</div>';
+
+    // Corby
+    const corbyActual = groupActual('CORBY', prov, bySku);
+    const corbyTarget = groupTarget('CORBY', prov);
+    const corbyP = pct(corbyActual, corbyTarget);
+    let corbyHtml = Object.entries(SKUS).filter(([,v])=>v.group==='CORBY').map(([sku])=>skuRow(sku,prov,bySku)).join('');
+    if (!corbyHtml) corbyHtml = '<div class="no-target" style="text-align:center;padding:12px">No data for this selection</div>';
+
+    // KDP
+    const kdpActual = groupActual('KDP', prov, bySku);
+    const kdpTarget = groupTarget('KDP', prov);
+    const kdpP = pct(kdpActual, kdpTarget);
+    let kdpHtml = Object.entries(SKUS).filter(([,v])=>v.group==='KDP').map(([sku])=>skuRow(sku,prov,bySku)).join('');
+    if (!kdpHtml) kdpHtml = '<div class="no-target" style="text-align:center;padding:12px">No data for this selection</div>';
+
+    document.getElementById('brand-grid').innerHTML = `
+    <div class="section-card">
+        <div class="section-header">
+            <div class="section-title abg">ACE Beverage Group (ABG)</div>
+            <div class="section-total">${fmt(abgActual)} / ${fmt(abgTarget)} &mdash; ${fmtPct(abgP)}</div>
+        </div>
+        <div class="section-body">${abgHtml}</div>
+    </div>
+    <div class="section-card">
+        <div class="section-header">
+            <div class="section-title corby">Corby</div>
+            <div class="section-total">${fmt(corbyActual)} / ${fmt(corbyTarget)} &mdash; ${fmtPct(corbyP)}</div>
+        </div>
+        <div class="section-body">${corbyHtml}</div>
+    </div>
+    <div class="section-card">
+        <div class="section-header">
+            <div class="section-title kdp">KDP</div>
+            <div class="section-total">${fmt(kdpActual)} / ${fmt(kdpTarget)} &mdash; ${fmtPct(kdpP)}</div>
+        </div>
+        <div class="section-body">${kdpHtml}</div>
+    </div>`;
+}
+
+// ================================================================
+//  RENDER — Leaderboard
+// ================================================================
+function renderLeaderboard(byRep) {
+    const reps = Object.entries(byRep)
+        .map(([name, d]) => ({name, total: d.total, byProv: d.byProv}))
+        .sort((a,b) => b.total - a.total);
+    document.getElementById('lb-count').textContent = `${reps.length} rep${reps.length!==1?'s':''}`;
+    if (!reps.length) {
+        document.getElementById('lb-body').innerHTML = '<div class="empty-state" style="padding:20px"><p>No data yet</p></div>';
+        return;
+    }
+    const maxTotal = reps[0].total || 1;
+    const rows = reps.slice(0,15).map((rep,i) => {
+        const r = i+1;
+        const cls = r===1?'rank-1':r===2?'rank-2':r===3?'rank-3':'rank-other';
+        const badges = Object.entries(rep.byProv).sort((a,b)=>b[1]-a[1]).slice(0,3)
+            .map(([p])=>provBadge(p)).join(' ');
+        const w = ((rep.total/maxTotal)*100).toFixed(0);
+        return `<tr>
+            <td><span class="rank-badge ${cls}">${r}</span></td>
+            <td>
+                <div style="font-weight:600">${rep.name}</div>
+                <div style="margin-top:3px">${badges}</div>
+                <div class="rep-bar"><div class="rep-bar-fill" style="width:${w}%"></div></div>
+            </td>
+            <td style="text-align:right;font-weight:800;font-size:14px">${fmt(rep.total)}</td>
+        </tr>`;
+    }).join('');
+    document.getElementById('lb-body').innerHTML = `
+    <table class="lb-table">
+        <thead><tr><th>#</th><th>Rep</th><th style="text-align:right">Samples</th></tr></thead>
+        <tbody>${rows}</tbody>
+    </table>`;
+}
+
+// ================================================================
+//  RENDER — Recent Activity
+// ================================================================
+function renderActivity(validRows, total) {
+    document.getElementById('activity-count').textContent = `${fmt(total)} total`;
+    if (!validRows.length) {
+        document.getElementById('activity-body').innerHTML = '<div class="empty-state" style="padding:20px"><p>No submissions yet</p></div>';
+        return;
+    }
+    const items = validRows.slice(0,12).map(row => `
+    <div class="activity-item">
+        <div>
+            <div class="activity-brand">${row.sku} ${provBadge(row.prov)}</div>
+            <div class="activity-rep">${row.rep}</div>
+            <div class="activity-location">${row.loc}</div>
+        </div>
+        <div>
+            <div class="activity-samples">${fmt(row.samples)}</div>
+            <div class="activity-date">${fmtDate(row.date)}</div>
+        </div>
+    </div>`).join('');
+    document.getElementById('activity-body').innerHTML = items;
+}
+
+// ================================================================
+//  RENDER — Unmatched brands warning
+// ================================================================
+function renderUnmatched(brands) {
+    const existing = document.getElementById('unmatched-banner');
+    if (existing) existing.remove();
+    if (!brands.size) return;
+    const banner = document.createElement('div');
+    banner.id = 'unmatched-banner';
+    banner.className = 'unmatched-banner';
+    banner.innerHTML = `⚠️ <span><strong>${brands.size} brand value${brands.size>1?'s':''} not matched to targets:</strong> ${[...brands].join(', ')} — check Column Setup or update brand aliases.</span>`;
+    document.querySelector('main').insertBefore(banner, document.getElementById('brand-grid'));
+}
+
+// ================================================================
+//  MAIN RENDER ORCHESTRATOR
+// ================================================================
+function renderDashboard() {
+    const filtered = getFilteredRows();
+    const { bySku, byRep, validRows, unmatchedBrands } = computeActuals(filtered);
+    renderKPIs(bySku);
+    renderBrandProgress(bySku);
+    renderLeaderboard(byRep);
+    renderActivity(validRows, filtered.length);
+    renderUnmatched(unmatchedBrands);
+}
+
+// ================================================================
+//  STATUS HELPERS
+// ================================================================
+function setStatus(state, msg) {
+    document.getElementById('status-dot').className = 'status-dot' + (state ? ' '+state : '');
+    document.getElementById('status-text').textContent = msg;
+}
+
+function setRefreshBtn(loading) {
+    const btn = document.getElementById('refresh-btn');
+    btn.disabled = loading;
+    btn.innerHTML = loading
+        ? '<div class="spinner"></div> Loading…'
+        : `<svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Refresh`;
+}
+
+// ================================================================
+//  REFRESH
+// ================================================================
+async function refreshData() {
+    if (isLoading) return;
+    isLoading = true;
+    setStatus('loading', 'Fetching data…');
+    setRefreshBtn(true);
+
+    try {
+        const { cols, rows } = await fetchSheetData();
+        allCols = cols;
+        allRows = rows;
+
+        // Auto-detect if first load or if previously empty
+        if (!colMap.brand && !colMap.samples) {
+            colMap = detectColumns(cols);
+        }
+
+        renderDashboard();
+        setStatus('', `Updated ${new Date().toLocaleTimeString('en-CA',{hour:'2-digit',minute:'2-digit'})}`);
+    } catch (err) {
+        console.error(err);
+        if (err.needsSetup) {
+            // Show the Apps Script setup modal
+            document.getElementById('brand-grid').innerHTML = `<div class="section-card" style="grid-column:1/-1;padding:32px">
+                <div class="error-box">
+                    <strong>⚠️ Browser blocked the connection</strong>
+                    Chrome prevents local HTML files from fetching external data directly. Complete the one-time setup below to permanently fix this.<br><br>
+                    <button class="btn btn-primary" style="margin-top:8px" onclick="openSetupModal()">▶ Open Setup Instructions</button>
+                </div>
+            </div>`;
+            setStatus('error', 'Setup required');
+            // Auto-open setup modal on first failure
+            if (!appsScriptUrl) openSetupModal();
+        } else {
+            document.getElementById('brand-grid').innerHTML = `<div class="section-card" style="grid-column:1/-1;padding:32px">
+                <div class="error-box">
+                    <strong>⚠️ Could not load data</strong>
+                    ${err.message}<br><br>
+                    <button class="btn btn-primary" style="margin-top:8px" onclick="openSetupModal()">▶ Open Setup Instructions</button>
+                </div>
+            </div>`;
+            setStatus('error', 'Connection error');
+        }
+    } finally {
+        isLoading = false;
+        setRefreshBtn(false);
+    }
+}
+
+// ================================================================
+//  FILTERS
+// ================================================================
+function setProvince(prov) {
+    activeProvince = prov;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.province === prov));
+    if (allRows.length) renderDashboard();
+}
+
+function applyFilters() {
+    activeDateFilter = document.getElementById('date-filter').value;
+    if (allRows.length) renderDashboard();
+}
+
+// ================================================================
+//  APPS SCRIPT SETUP MODAL
+// ================================================================
+function openSetupModal() {
+    document.getElementById('setup-modal').classList.add('open');
+}
+function closeSetupModal() {
+    document.getElementById('setup-modal').classList.remove('open');
+}
+function saveScriptUrl() {
+    const input = document.getElementById('apps-script-url-input').value.trim();
+    if (!input.startsWith('https://script.google.com')) {
+        alert('That doesn\'t look like a valid Apps Script URL. It should start with https://script.google.com/macros/s/...');
+        return;
+    }
+    appsScriptUrl = input;
+    localStorage.setItem('aceSamplingScriptUrl', appsScriptUrl);
+    updateConnectBtn();
+    closeSetupModal();
+    refreshData();
+}
+function copyScript() {
+    const code = document.getElementById('apps-script-code').innerText;
+    navigator.clipboard.writeText(code).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+    });
+}
+document.getElementById('setup-modal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeSetupModal();
+});
+
+// ================================================================
+//  SETTINGS MODAL
+// ================================================================
+function openSettings() {
+    const fields  = ['date','rep','location','brand','samples'];
+    const selIds  = ['col-date','col-rep','col-location','col-brand','col-samples'];
+    selIds.forEach((id,i) => {
+        const sel = document.getElementById(id);
+        sel.innerHTML = '<option value="">— Not mapped —</option>' +
+            allCols.map(c => `<option value="${c}"${colMap[fields[i]]===c?' selected':''}>${c}</option>`).join('');
+    });
+    if (allCols.length) {
+        document.getElementById('detected-cols').style.display = 'block';
+        document.getElementById('detected-cols-list').innerHTML = allCols.map(c => {
+            const mappedAs = fields.map((f,i) => colMap[f]===c ? fields[i].toUpperCase() : null).filter(Boolean).join(', ');
+            return `<div class="detected-col-row"><span>${c}</span><strong>${mappedAs||'—'}</strong></div>`;
+        }).join('');
+    }
+    document.getElementById('settings-modal').classList.add('open');
+}
+
+function closeSettings() { document.getElementById('settings-modal').classList.remove('open'); }
+
+function saveSettings() {
+    const fields = ['date','rep','location','brand','samples'];
+    const selIds = ['col-date','col-rep','col-location','col-brand','col-samples'];
+    selIds.forEach((id,i) => { colMap[fields[i]] = document.getElementById(id).value || null; });
+    closeSettings();
+    if (allRows.length) renderDashboard();
+}
+
+document.getElementById('settings-modal').addEventListener('click', e => { if (e.target===e.currentTarget) closeSettings(); });
+
+// ================================================================
+//  AUTO-REFRESH every 5 minutes + INIT
+// ================================================================
+// Hide "Connect Data" button once URL is saved
+function updateConnectBtn() {
+    const btn = document.getElementById('connect-btn');
+    if (appsScriptUrl) {
+        btn.style.display = 'none';
+    }
+}
+updateConnectBtn();
+setInterval(refreshData, 5 * 60 * 1000);
+refreshData();
+</script>
+
+
+</body></html>

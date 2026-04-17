@@ -380,12 +380,12 @@
     <div class="bottom-grid">
         <div class="section-card">
             <div class="section-header">
-                <div class="section-title neutral">Rep Leaderboard</div>
+                <div class="section-title neutral">Source Leaderboard</div>
                 <div class="section-total" id="lb-count">1 rep</div>
             </div>
             <div class="section-body" id="lb-body">
     <table class="lb-table">
-        <thead><tr><th>#</th><th>Rep</th><th style="text-align:right">Samples</th></tr></thead>
+        <thead><tr><th>#</th><th>Source</th><th style="text-align:right">Samples</th></tr></thead>
         <tbody><tr>
             <td><span class="rank-badge rank-1">1</span></td>
             <td>
@@ -707,7 +707,7 @@ function provBadge(p) {
 function detectColumns(cols) {
     const patterns = {
         date:     ['sampling date','date','event date','shift date','timestamp'],
-        rep:      ['rep name','rep','your name','name','employee','agent','staff'],
+        rep:      ['source','rep name','rep','your name','name','employee','agent','staff'],
         location: ['sampling location','location','city','province','where','market'],
         brand:    ['brand','sku','product','brand sampled','product sampled','item'],
         samples:  ['samples distributed','number of samples','# of samples','samples','units','qty','quantity','distributed'],
